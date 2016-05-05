@@ -33,7 +33,7 @@
       "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user",
       "availableDatabases", "hasProperties", "viewSettings", "aceMode", "snippetImage", "errorLoadingQueries",
       "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta",
-      "dependents"
+      "dependents", "canWrite"
     ]
   };
 
@@ -1028,6 +1028,7 @@
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.parentSavedQueryUuid = ko.observable(typeof notebook.parentSavedQueryUuid != "undefined" && notebook.parentSavedQueryUuid != null ? notebook.parentSavedQueryUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
+    self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
     self.creatingSessionLocks = ko.observableArray();
@@ -1496,9 +1497,9 @@
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.canSave = ko.computed(function() {
       // Saved query or history but history coming from a saved query
-      return self.selectedNotebook() && (
-         self.selectedNotebook().isSaved() ||
-         (self.selectedNotebook().isHistory() && self.selectedNotebook().parentSavedQueryUuid())
+      return self.selectedNotebook() && self.selectedNotebook().canWrite() && (
+          self.selectedNotebook().isSaved() ||
+          (self.selectedNotebook().isHistory() && self.selectedNotebook().parentSavedQueryUuid())
       );
     });
 
@@ -1646,7 +1647,8 @@
         data: true,
         dependencies: true
       }, function (data) {
-        data.data.dependents = data.dependents
+        data.data.dependents = data.dependents;
+        data.data.can_write = data.document.can_write;
         var notebook = data.data;
         self.loadNotebook(notebook);
         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
