@@ -143,12 +143,17 @@ def get_document(request):
     document = Document2.objects.get_by_path(user=request.user, path=path)
 
   response = {
-    'document': document.to_dict(request.user),
+    'document': document.to_dict(),
     'parent': document.parent_directory.to_dict() if document.parent_directory else None,
     'children': [],
     'dependencies': [],
     'dependents': [],
     'data': ''
+  }
+
+  response['user_perms'] = {
+    'can_read': document.can_read(request.user),
+    'can_write': document.can_write(request.user)
   }
 
   if with_data:

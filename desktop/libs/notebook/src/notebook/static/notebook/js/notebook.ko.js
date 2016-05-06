@@ -1660,7 +1660,7 @@
         dependencies: true
       }, function (data) {
         data.data.dependents = data.dependents;
-        data.data.can_write = data.document.can_write;
+        data.data.can_write = data.user_perms.can_write;
         var notebook = data.data;
         self.loadNotebook(notebook);
         hueUtils.changeURL('/notebook/editor?editor=' + data.document.id);
